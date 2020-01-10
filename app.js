@@ -16,7 +16,7 @@ class App {
     this.$modalTitle = document.querySelector(".modal-title");
     this.$modalText = document.querySelector(".modal-text");
     this.$modalCloseButton = document.querySelector(".modal-close-button");
-    this.$colorTooltip = document.querySelector('#color-tooltip');
+    this.$colorTooltip = document.querySelector("#color-tooltip");
 
     this.addEventListeners();
   }
@@ -26,30 +26,31 @@ class App {
       this.handleFormClick(event);
       this.selectNote(event);
       this.openModal(event);
+      this.deleteNote(event);
     });
 
-    document.body.addEventListener('mouseover', event => {
-       this.openTooltip(event);
+    document.body.addEventListener("mouseover", event => {
+      this.openTooltip(event);
     });
 
-     document.body.addEventListener('mouseout', event => {
-       this.closeTooltip(event);
+    document.body.addEventListener("mouseout", event => {
+      this.closeTooltip(event);
     });
 
-    this.$colorTooltip.addEventListener('mouseover', function() {
-      this.style.display = 'flex';
-    })
-
-    this.$colorTooltip.addEventListener('mouseout', function() {
-       this.style.display = 'none';
+    this.$colorTooltip.addEventListener("mouseover", function() {
+      this.style.display = "flex";
     });
 
-    this.$colorTooltip.addEventListener('click', event => {
-       const color = event.target.dataset.color;
-       if (color) {
-         this.editNoteColor(color);
-       }
-    })
+    this.$colorTooltip.addEventListener("mouseout", function() {
+      this.style.display = "none";
+    });
+
+    this.$colorTooltip.addEventListener("click", event => {
+      const color = event.target.dataset.color;
+      if (color) {
+        this.editNoteColor(color);
+      }
+    });
 
     this.$form.addEventListener("submit", event => {
       event.preventDefault();
@@ -103,6 +104,8 @@ class App {
   }
 
   openModal(event) {
+    if (event.target.matches('.toolbar-delete')) return;
+
     if (event.target.closest(".note")) {
       this.$modal.classList.toggle("open-modal");
       this.$modalTitle.value = this.title;
@@ -116,18 +119,18 @@ class App {
   }
 
   openTooltip(event) {
-    if (!event.target.matches('.toolbar-color')) return;
-    this.id = event.target.dataset.id;
+    if (!event.target.matches(".toolbar-color")) return;
+    this.id = event.target.nextElementSibling.dataset.id;
     const noteCoords = event.target.getBoundingClientRect();
-    const horizontal = noteCoords.left + window.scrollX;
-    const vertical = noteCoords.top + window.scrollY;
+    const horizontal = noteCoords.left;
+    const vertical = window.scrollY - 20;
     this.$colorTooltip.style.transform = `translate(${horizontal}px, ${vertical}px)`;
-    this.$colorTooltip.style.display = 'flex';
+    this.$colorTooltip.style.display = "flex";
   }
 
   closeTooltip(event) {
-    if (!event.target.matches('.toolbar-color')) return;
-    this.$colorTooltip.style.display = 'none';
+    if (!event.target.matches(".toolbar-color")) return;
+    this.$colorTooltip.style.display = "none";
   }
 
   addNote({ title, text }) {
@@ -167,6 +170,14 @@ class App {
     this.id = $selectedNote.dataset.id;
   }
 
+  deleteNote(event) {
+    event.stopPropagation();
+    if (!event.target.matches('.toolbar-delete')) return;
+    const id = event.target.dataset.id;
+    this.notes = this.notes.filter(note => note.id !== Number(id));
+    this.displayNotes();
+  }
+
   displayNotes() {
     const hasNotes = this.notes.length > 0;
     this.$placeholder.style.display = hasNotes ? "none" : "flex";
@@ -181,8 +192,12 @@ class App {
           <div class="note-text">${note.text}</div>
           <div class="toolbar-container">
             <div class="toolbar">
-              <img class="toolbar-color" data-id=${note.id} src="https://icon.now.sh/palette">
-              <img class="toolbar-delete" src="https://icon.now.sh/delete">
+              <img class="toolbar-color" data-id=${
+                note.id
+              } src="https://icon.now.sh/palette">
+              <img data-id=${
+                note.id
+              } class="toolbar-delete" src="https://icon.now.sh/delete">
             </div>
           </div>
         </div>
