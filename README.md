@@ -1,2 +1,2 @@
-# Google-Keep-Clone
-A clone of the popular note-taking app, Google Keep, using vanilla Javascript.
+# Lightning Notes
+✏📜 A super fast & minimalistic note taker app, built using vanilla Javascript and some beautiful CSS.✏📜
